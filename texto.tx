@@ -1,0 +1,40 @@
+create database "pedro";
+
+create table tb_produto(
+	id_produto serial primary key,
+	tx_nome varchar (200),
+	tx_categoria varchar (200),
+	tx_horarioideal varchar (200),
+	vl_preco numeric (18, 2)
+ );
+
+ create table tb_compra(
+ 	id_compra serial primary key,
+	cd_cliente integer references tb_cliente (id_cliente),
+	cd_produto integer references tb_produto (id_produto),
+	cd_estoque integer references tb_estoque (id_estoque),
+	nr_promocao numeric (18, 2)
+ );
+
+ create table tb_estoque(
+	id_estoque serial primary key,
+	cd_produto integer references tb_produto (id_produto),
+	nr_quantidade numeric (18, 0),
+	fl_estoque boolean
+ );
+
+ create table tb_cliente(
+ 	id_cliente serial primary key,
+	tx_email varchar (200),
+	tx_senha varchar (200),
+	tx_nome varchar (200),
+	tx_endereco varchar (200),
+	tx_telefone varchar (15, 0) not null
+	);
+
+create table tb_nota(
+	id_nota serial primary key,
+	cd_produto integer tb_produto (id_produto),
+	tx_nome varchar (200),
+	tx_imagem varchar (500)
+);
