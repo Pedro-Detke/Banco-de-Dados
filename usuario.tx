@@ -1,0 +1,34 @@
+create table tb_usuario(
+id_usuario serial,
+tx_nome varchar(255),
+tx_email varchar(255),
+tx_senha varchar(255),
+cd_tipousuario integer not null,
+
+constraint pk_tb_usuario primary key(id_usuario),
+constraint fk_tb_usuario_cd_tipousuario foreign key (cd_tipousuario) references tb_tipousuario(id_tipousuario)
+);
+
+insert into tb_usuario(tx_nome,cd_tipousuario)
+	values('Jonas',3);
+	values('lalal',2);
+	values('isa',1);
+	values('lololo',3);
+	values('risos',2);
+	values('eva',1);
+	values('alex',3);
+	values('sandro',2);
+	values('enzo',1);
+	values('lucas',3);
+	values('rato',2);
+	
+create table tb_tipousuario(
+id_tipousuario serial,
+tx_tipo varchar(255) not null,
+
+constraint pk_tb_tipousuario primary key(id_tipousuario)
+);
+
+insert into tb_tipousuario(nr_tipo) values('adimin', 'cliente','fornecedor');
+
+select * from tb_usuario inner join tb_tipousuario on tb_tipousuario.id_tipousuario = tb_usuario.cd_tipousuario
