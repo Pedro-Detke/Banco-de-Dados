@@ -1,0 +1,52 @@
+select tx_nome,cd_categoria,vl_preco, nr_estoque,tb_categoria.tx_descricao 
+from tb_produto
+inner join tb_categoria on tb_categoria.id_categoria = tb_produto.cd_categoria 
+where vl_preco between 500 and 1000
+and fl_ativo is true;
+
+
+
+select tx_nome,tx_cpf,tx_email  from tb_cliente
+where UPPER(tx_estado) in (UPPER('SC'), upper('PR'))
+order by tx_nome asc;
+
+
+
+select tx_nome as nomeUsuario, nr_idade as idadeUsuario from tb_cliente
+where tx_email is null
+or nr_idade >50;
+
+select tx_nome as nomeProduto,
+vl_preco as precoProduto,
+tb_fornecedor.tx_nome as nomeFornecedor,
+tb_categoria.tx_descricao as descricaoCategoria
+from tb_produto
+inner join tb_fornecedor on tb_fornecedor.id_fornecedor = tb_produto.cd_fornecedor
+inner join tb_categoria on tb_categoria.id_categoria = tb_produto.cd_categoria 
+where tb_produto.fl_ativo is true
+order by vl_preco desc;
+
+select tx_nome as nomeCliente,
+tx_cidade as cidadeCliente,
+count(id_venda) as idVenda
+from tb_cliente
+left join tb_venda on tb_venda.cd_cliente = tb_cliente.id_cliente
+group by tx_nome, tx_cidade
+order by id_venda desc;
+
+select tb_categoria.tx_nome as nome,
+id_categoria as categoria,
+tb_categoria.tx_descricao as descricao
+from tb_categoria 
+left join tb_produto on tb_produto.cd_categoria = tb_categoria.id_categoria 
+where id_produto is null
+order by tb_categoria.tx_nome asc;
+
+select tx_nome as nome,
+sum (tiv.vl_unitario  * tiv.nr_quantidade   ) as idItemVenda
+from tb_cliente
+left join tb_venda on tb_venda.cd_cliente = tb_cliente.id_cliente
+inner join tb_item_venda tiv on tiv.cd_venda = tb_venda.id_venda 
+group by tx_nome
+
+
