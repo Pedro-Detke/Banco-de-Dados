@@ -1,0 +1,123 @@
+select tx_nome as nome,
+celular.tx_contato as celular,
+telefoneFixo.tx_contato as Fixo,
+email.tx_contato as email,
+tb_endereco.tx_cidade as cidade,
+tb_endereco.tx_estado as estado
+from tb_cliente 
+left join tb_endereco on tb_endereco.id_endereco = tb_cliente.cd_endereco
+left join tb_contato telefoneFixo on
+telefoneFixo.cd_cliente = tb_cliente.id_cliente
+and telefoneFixo.cd_tipo_contato = 3
+left join tb_contato celular on
+celular.cd_cliente = tb_cliente.id_cliente
+and celular.cd_tipo_contato = 2
+left join tb_contato email on
+email.cd_cliente = tb_cliente.id_cliente
+and email.cd_tipo_contato = 1;
+
+
+select tx_nome as nome,
+email.tx_contato as email
+from tb_cliente
+left join tb_contato email on
+email.cd_cliente = tb_cliente.id_cliente
+and email.cd_tipo_contato = 1
+order by tx_nome asc;
+
+
+select tb_cliente.tx_nome as nome,
+tb_avaliacao.tx_comentario as comentario,
+tb_avaliacao.nr_nota as nota,
+tb_produto.tx_descricao 
+from tb_cliente 
+inner join tb_avaliacao on tb_avaliacao.cd_cliente = tb_cliente.id_cliente 
+inner join tb_produto on tb_produto.id_produto = tb_avaliacao.cd_produto;
+
+select tx_nome as nome,
+nr_idade as idade
+from tb_cliente
+where nr_idade > (select sum(nr_idade) / count(nr_idade) from tb_cliente );
+
+avg(nr_idade) as media
+
+
+select count(id_cliente) from tb_cliente
+left join tb_contato celular on celular.cd_cliente = tb_cliente.id_cliente and celular.cd_tipo_contato = 2
+left join tb_contato email on email.cd_cliente = tb_cliente.id_cliente and email.cd_tipo_contato = 1
+left join tb_contato telefone on telefone.cd_cliente = tb_cliente.id_cliente and telefone.cd_tipo_contato = 1
+where exists(
+select 1 from tb_contato where tb_contato
+)
+
+
+select count(cd_cliente), tb_tipo_contato.tx_descricao  from tb_contato 
+inner join tb_tipo_contato  on tb_tipo_contato.id_tipo_contato = tb_contato.cd_tipo_contato
+group by tb_tipo_contato.tx_descricao;
+
+
+with vendamaior as(select dt_venda, cd_cliente  from tb_venda
+where upper(tx_status ) = upper('pago')
+order by dt_venda desc, cd_cliente desc)
+select dt_venda, cd_cliente  from tb_venda 
+inner join vendamaior on vendamaior.cd_cliente = tb_venda.cd_cliente 
+and tb_venda.dt_venda >= vendamaior.dt_venda
+
+
+with vendamaior as (
+select
+max(dt_venda) as maior,
+cd_cliente
+from
+tb_venda
+where upper(tx_status) = upper('PAGO')
+group by cd_cliente
+)
+select
+*
+from
+tb_venda
+inner join vendamaior
+on vendamaior.cd_cliente = tb_venda.cd_cliente
+and tb_venda.dt_venda >= vendamaior.maior
+
+with vendas as(
+select
+	tb_venda.cd_empresa ,
+	sum(nr_quantidade * vl_unitario) as receita
+from
+	tb_item_venda
+inner join tb_venda on
+	tb_venda.id_venda = tb_item_venda.cd_venda
+where
+	upper(tx_status) = upper('pago')
+group by
+	tb_venda.cd_empresa
+),
+total as (
+select
+	tb_venda.cd_empresa ,
+	count (cd_empresa) as venda 
+from
+	tb_venda
+where
+	upper(tx_status) = upper('pago')
+group by
+	tb_venda.cd_empresa
+)
+select
+	total.venda,
+	vendas.receita,
+	tx_razao_social as razao
+from
+	tb_empresa
+inner join vendas on
+	vendas.cd_empresa = tb_empresa.id_empresa
+	and  receita > 10000
+inner join total on total.cd_empresa =id_empresa and total.venda > 3
+order by
+	vendas desc
+	
+	
+	
+	
