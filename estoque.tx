@@ -1,0 +1,55 @@
+with quantidade as(
+	select sum(nr_quantidade * vl_unitario) as media
+	from
+	tb_item_venda
+inner join tb_venda on
+	tb_venda.id_venda = tb_item_venda.cd_venda
+where
+	upper(tx_status) = upper('pago')
+	),
+	gasto as(
+	select
+	sum(nr_quantidade * vl_unitario) as totalgasto,
+	tb_venda.cd_cliente as cliente
+	from tb_venda 
+inner join tb_cliente on tb_cliente.id_cliente = tb_venda.cd_cliente
+inner join tb_item_venda on tb_venda.id_venda = tb_item_venda.cd_venda 
+where
+	upper(tx_status) = upper('pago')
+group by
+	tb_venda.cd_cliente
+	)
+	select tx_nome,gasto.totalgasto from tb_cliente
+	inner join gasto on gasto.cliente = tb_cliente.id_cliente
+	inner join quantidade on totalgasto > media;
+	ou
+	where 
+	totalgasto > (select media from quantidade)
+	
+	
+	select * from tb_cliente
+	where upper(tx_nome) like upper('a%') or tx_nome like upper('%o');
+	
+	
+	with mediaestoque as(
+	select avg(nr_estoque) as mediaestoque,
+	cd_categoria as categoria
+	from tb_produto
+	group by tb_produto.cd_categoria
+	),
+	diferenca as(
+	select (mediaestoque - tb_produto.nr_estoque) as diferencaestoque,
+	tb_produto.cd_categoria as categ
+	from mediaestoque 
+	inner join tb_produto on tb_produto.cd_categoria = mediaestoque.categoria
+	)
+	select
+	tb_produto.tx_nome,
+	nr_estoque,
+	tb_categoria.tx_nome,
+	mediaestoque.mediaestoque,
+	diferenca.diferencaestoque
+	from tb_produto
+	inner join tb_categoria on tb_categoria.id_categoria = tb_produto.cd_categoria 
+	inner join mediaestoque on mediaestoque > nr_estoque and tb_produto.cd_categoria = mediaestoque .categoria 
+	inner join diferenca on diferenca.categ = tb_produto.cd_categoria 
