@@ -1,0 +1,103 @@
+with mediaestoque as(
+	select avg(nr_estoque) as mediaestoque,
+	cd_categoria as categoria
+	from tb_produto
+	group by tb_produto.cd_categoria
+	),
+	diferenca as(
+	select (mediaestoque - tb_produto.nr_estoque) as diferencaestoque,
+	tb_produto.cd_categoria as categ
+	from mediaestoque 
+	inner join tb_produto on tb_produto.cd_categoria = mediaestoque.categoria
+	)
+	select
+	tb_produto.tx_nome,
+	nr_estoque,
+	tb_categoria.tx_nome,
+	mediaestoque.mediaestoque,
+	diferenca.diferencaestoque
+	from tb_produto
+	inner join tb_categoria on tb_categoria.id_categoria = tb_produto.cd_categoria 
+	inner join mediaestoque on mediaestoque > nr_estoque and tb_produto.cd_categoria = mediaestoque .categoria 
+	inner join diferenca on diferenca.categ = tb_produto.cd_categoria ;
+
+	
+	with estoqueAtual as (
+select
+avg (nr_estoque) as estoque,
+cd_categoria
+from tb_produto produto
+group by cd_categoria
+)
+select
+produto.tx_nome,
+produto.cd_categoria,
+estoqueAtual.estoque,
+(estoque - nr_estoque) as diferenca
+from tb_produto produto
+inner join estoqueAtual
+on
+estoque > nr_estoque and
+produto.cd_categoria = estoqueAtual.cd_categoria
+	
+
+	
+	
+	
+	--case
+		--when nr_idade > 60 then 'Aposentado'
+		--when nr_idade < 60 then 'Adulto'
+	--else 'Criança' end
+	
+	
+
+
+with funcoes as(
+select
+sum(nr_quantidade * vl_unitario) as totalGasto,
+count(distinct id_venda) as totalVendas,
+max(dt_venda) as primeiraCompra,
+min(dt_venda) as ultimaCompra,
+cd_cliente
+from tb_item_venda itemVenda
+inner join tb_venda venda
+on
+venda.id_venda = itemVenda.cd_venda
+where
+upper(tx_status) = upper ('PAGO')
+group by cd_cliente
+)
+select
+cliente.tx_nome,
+funcoes.totalGasto,
+funcoes.totalVendas,
+funcoes.primeiraCompra,
+funcoes.ultimaCompra,
+(
+select
+produto.tx_descricao
+from tb_item_venda itemVenda
+inner join tb_produto produto
+on
+produto.id_produto = itemVenda.cd_produto
+inner join tb_venda venda
+on
+venda.id_venda = itemVenda.cd_venda
+where
+upper(tx_status) = upper ('PAGO')
+and venda.cd_cliente = cliente.id_cliente
+group by itemVenda.cd_produto, produto.tx_descricao
+order by
+sum(nr_quantidade) desc
+limit 1
+) as produto_favorito,
+case
+when funcoes.totalVendas < 1 then 'CLIENTE PEQUENO'
+when funcoes.totalVendas = 1 then 'CLIENTE MEDIO'
+when funcoes.totalVendas = 2 then 'CLIENTE GRANDE'
+else 'OUTROS'
+end
+from tb_cliente cliente
+inner join funcoes
+on
+cliente.id_cliente = funcoes.cd_cliente;
