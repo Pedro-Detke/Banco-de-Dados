@@ -1,0 +1,99 @@
+select * from tb_atividade
+
+alter table tb_atividade
+	add collum nr_idade numeric (18,0) default 18
+alter table tb_atividade
+	drop collum nr_idade
+
+create table tb_atividade as (
+with funcoes as(
+select
+sum(nr_quantidade * vl_unitario) as totalGasto,
+count(distinct id_venda) as totalVendas,
+max(venda.dt_venda) as ultimaCompra,
+min(Venda.dt_venda) as primeiraCompra,
+venda.cd_cliente
+from tb_venda Venda
+inner join tb_item_venda itemvenda
+on
+venda.id_venda = itemVenda.cd_venda
+where
+upper(tx_status) = upper ('PAGO')
+group by venda.cd_cliente
+)
+select
+	cliente.tx_nome,
+	ende.tx_cidade,
+	funcoes.totalGasto,
+	funcoes.totalVendas,
+	funcoes.primeiraCompra,
+	funcoes.ultimaCompra,
+	(
+	select
+p.tx_nome as produtoFavorito
+from
+tb_venda venda
+inner join tb_item_venda prod on
+prod.cd_venda = venda.id_venda
+inner join tb_produto p on p.id_produto = prod.cd_produto
+where
+upper(venda.tx_status) = upper('pago')
+and cliente.id_cliente = venda.cd_cliente
+group by p.tx_nome, p.id_produto
+order by sum(prod.nr_quantidade) desc
+limit 1
+) as produto_favorito,
+	case
+		when funcoes.totalVendas < 1 then 'CLIENTE PEQUENO'
+		when funcoes.totalVendas = 1 then 'CLIENTE MEDIO'
+		when funcoes.totalVendas = 2 then 'CLIENTE GRANDE'
+		else 'OUTROS'
+	end
+from
+	tb_cliente cliente
+inner join funcoes
+on
+	cliente.id_cliente = funcoes.cd_cliente
+inner join tb_endereco ende
+on
+	ende.id_endereco = cliente.cd_endereco
+);
+
+
+create table tb_relatorio(
+tx_nome varchar(255) not null,
+tx_cidade varchar(255) not null,
+vl_totalGasto numeric(18,2),
+nr_totalVendas numeric(18,0),
+dt_primeiraCompra timestamp default now(),
+dt_ultimaCompra timestamp default now(),
+tx_produtoFavorito varchar(255),
+tx_status varchar(255) not null
+)
+insert into tb_relatorio (tx_nome, tx_cidade, vl_totalGasto, nr_totalVendas, dt_primeiraCompra, dt_ultimaCompra, tx_produtoFavorito, tx_status)
+values 	
+	('Ana Souza', 'Chapecó', 857977, 2, '2024-01-10 09:30:00.000', '2024-03-22 13:30:00.000', 'Mouse Multilaser', 'CLIENTE GRANDE' ),
+	('Bruno Lima', 'Florianópolis', 12649.77, 2, '2024-01-15 14:00:00.000', '2024-06-12 11:00:00.000', 'iPhone 15', 'CLIENTE GRANDE' );
+
+
+
+alter table tb_produto 
+add column vl_peso numeric (18,0)
+
+update tb_produto set vl_peso = (id_produto * vl_preco )
+
+update tb_produto set vl_peso = 28.3 where id_produto = 12;
+ 
+alter table tb_cliente 
+add column tx_cnpj varchar(255)
+
+alter table tb_produto 
+add column tx_categoria varchar(255)
+
+update tb_produto set tx_categoria = (select tx_categoria from tb_categoria
+where tb_produto.cd_categoria = tb_categoria.id_categoria )
+
+
+select * from tb_atividade
+delete from tb_atividade 
+where upper(tx_nome) = upper('eva costa')
