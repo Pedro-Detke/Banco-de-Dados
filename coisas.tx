@@ -97,3 +97,33 @@ where tb_produto.cd_categoria = tb_categoria.id_categoria )
 select * from tb_atividade
 delete from tb_atividade 
 where upper(tx_nome) = upper('eva costa')
+
+
+alter table tb_produto 
+add column tx_categoria varchar(255);
+
+alter table tb_categoria 
+
+update tb_produto set
+tx_categoria = (select tb_produto.tx_nome  
+from 
+tb_categoria
+where
+tb_produto.cd_categoria = tb_categoria.id_categoria )
+
+
+select * from tb_atividade
+delete from tb_atividade 
+where upper(tx_nome) = upper('eva costa')
+
+select
+tx_nome as nome,
+max(historico.vl_preco_novo),
+min(historico.vl_preco_novo)
+from tb_produto produto
+inner join tb_preco_historico historico
+on
+historico.cd_produto = produto.id_produto
+where
+historico.dt_alteracao between '01-02-2024' and '30-03-2024'
+group by tx_nome
