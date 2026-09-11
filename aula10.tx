@@ -1,0 +1,17 @@
+select * from tb_produto;
+
+delete from tb_pedido where id_pedido = 9;
+
+delete from tb_pedido where nr_quantidade < 3 and dt_pedido < '2024-02-01';
+
+select * from tb_pedido;
+
+select tb_categoria.tx_nome,  id_categoria, count(id_produto ) from tb_categoria  
+inner join tb_produto  on tb_produto.cd_categoria = tb_categoria.id_categoria and tb_produto.fl_ativo is true
+group by id_categoria, tb_categoria.tx_nome;
+
+
+select tb_categoria.tx_nome, count(id_produto) from tb_categoria 
+inner join tb_produto  on tb_produto.cd_categoria = tb_categoria.id_categoria
+group by tb_categoria.id_categoria, tb_categoria.tx_nome
+having count(id_produto)>2
