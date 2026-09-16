@@ -41,3 +41,18 @@ select * from tb_pedido
 
 
 update tb_pedido set cd_cliente = 3 where id_pedido =7
+
+select tb_categoria.tx_nome, min(tb_produto.vl_preco), max(tb_produto.vl_preco) from tb_categoria 
+inner join tb_produto on tb_produto.cd_categoria = tb_categoria.id_categoria 
+group by tb_categoria.tx_nome
+
+select tb_produto.tx_nome, sum(tb_pedido.nr_quantidade * tb_produto.vl_preco) as total from tb_produto
+inner join tb_pedido on tb_pedido.cd_produto  = tb_produto.id_produto 
+group by tb_produto.tx_nome
+order by total desc
+
+
+alter table tb_produto
+add column cd_cliente integer,
+add constraint cd_cliente FOREIGN key(cd_cliente)
+REFERENCES tb_cliente(id_cliente)
