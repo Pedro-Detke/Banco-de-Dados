@@ -1,0 +1,88 @@
+create table tb_usuario(
+id_usuario serial primary key,
+tx_nome varchar (255) not null,
+tx_email varchar (255) not null,
+tx_senha varchar (255) not null
+);
+
+create table tb_endereco(
+id_endereco serial primary key,
+cd_usuario INTEGER references tb_usuario(id_usuario),
+tx_endereco varchar (255) not null
+);
+
+create table tb_avaliacao(
+id_avaliacao serial primary key,
+cd_usuario INTEGER references tb_usuario(id_usuario),
+cd_perfume INTEGER references tb_perfume(id_perfume),
+tx_descricao varchar (255),
+vl_nota numeric (2,1) not null,
+dt_data timestamp default now()
+);
+
+create table tb_venda(
+id_venda serial primary key,
+cd_usuario INTEGER references tb_usuario(id_usuario),
+vl_valor numeric (255) not null,
+dt_venda timestamp default now()
+);
+
+create table tb_venda_produto(
+id_venda_produto serial primary key,
+cd_venda INTEGER references tb_venda(id_venda),
+cd_perfume INTEGER references tb_perfume(id_perfume)
+);
+
+create table tb_perfume(
+id_perfume serial primary key,
+tx_nome varchar (255) not null,
+tx_descricao varchar (255) not null,
+tx_horario_ideal varchar (255) not null,
+vl_preco numeric (18,2) not null
+);
+
+create table tb_imagem_perfume(
+id_imagem_perfume serial primary key,
+cd_perfume INTEGER REFERENCES tb_perfume(id_perfume),
+tx_imagem varchar (255) not null
+);
+
+create table tb_notas(
+id_notas serial primary key,
+cd_perfume INTEGER REFERENCES tb_perfume(id_perfume),
+cd_imagem_nota INTEGER REFERENCES tb_imagem_nota(id_imagem_nota)
+);
+
+create table tb_imagem_nota(
+id_imagem_nota serial primary key,
+tx_imagem varchar (255) not null
+);
+
+create table tb_categoria(
+id_categoria serial primary key,
+tx_nome varchar (255) not null
+);
+
+
+
+alter table tb_perfume add column cd_notas INTEGER REFERENCES tb_notas(id_notas);
+alter table tb_perfume add column cd_imagem_perfume INTEGER references tb_imagem_perfume(id_imagem_perfume);
+alter table tb_perfume add column cd_categoria INTEGER references tb_categoria(id_categoria);
+alter table tb_usuario add column tx_telefone varchar (255);
+alter table tb_venda alter column vl_valor type numeric(18,2);
+alter table tb_avaliacao add constraint vl_nota check (vl_nota <= 5 or vl_nota  >=1);
+
+
+
+create sequence seq_usuario start 1 increment 1;
+
+alter table tb_usuario alter column id_usuario
+type numeric(18,0) primary key;
+
+alter table tb_usuario alter column id_usuario set default nextval('seq_usuario');
+
+id_usuario numeric(18,0)
+default nextval ('seq_usuario') primary key
+
+comment on column tb_avaliacao.vl_nota is
+'valores <= 5, para virar média futuramente';
