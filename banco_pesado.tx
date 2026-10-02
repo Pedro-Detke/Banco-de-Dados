@@ -1,0 +1,57 @@
+explain
+select * from tb_usuarios
+where tx_email = 'usuario50000@exemplo.com';
+
+create unique index
+idx_usuario_email
+on tb_usuarios(tx_email);
+
+select tp.dt_pedido, tp.id_pedido, tp.vl_total from tb_pedidos tp 
+where cd_usuario = 1234;
+
+create index
+idx_pedidos_usuario
+on tb_pedidos(cd_usuario);
+
+select u.tx_nome, p.id_pedido, pr.tx_nome, ip.nr_quantidade, ip.vl_unitario  from tb_usuarios u
+inner join tb_pedidos p on p.cd_usuario  = u.id_usuario 
+inner join tb_itens_pedido ip on ip.cd_pedido = p.id_pedido 
+inner join tb_produtos pr on pr.id_produto  = ip.cd_produto 
+where u.id_usuario = 1234;
+
+create index
+idx_usuarios_id
+on tb_usuarios(id_usuario);
+--depois 0,157s
+
+create index
+idx_itens_pedido_cd_pedido
+on tb_itens_pedido(cd_pedido);
+--depois 0,006s
+--97% melhor
+
+create index
+idx_itens_pedido_quantidade
+on tb_itens_pedido(nr_quantidade);
+--depois 0,133s
+
+--antes 0,28s
+
+select id_pedido, tp.vl_total  from tb_pedidos tp 
+where UPPER(tp.tx_status) = upper('entregue') and tp.dt_pedido >= '2023-05-23';
+--0,005
+
+create index
+idx_status
+on tb_pedidos(tx_status);
+--60% 0,002
+
+select tx_nome, te.nr_numero, te.tx_cidade, te.tx_logradouro  from tb_usuarios tu 
+inner join tb_enderecos te on tu.id_usuario = te.cd_usuario
+where te.fl_principal is true;
+--0,2
+
+create index
+idx_endereco
+on tb_enderecos(cd_usuario);
+--88% 0,176
