@@ -55,3 +55,61 @@ create index
 idx_endereco
 on tb_enderecos(cd_usuario);
 --88% 0,176
+
+create view vw_pedidos_usuario as (
+select
+	tu.id_usuario,
+	sum(tip.nr_quantidade),
+	count(distinct tp2.id_pedido),
+	sum ((tip.nr_quantidade * tip.vl_unitario) - tip.vl_desconto ) as liquido
+from
+	tb_pedidos tp2
+inner join tb_usuarios tu
+on
+	tu.id_usuario = tp2.cd_usuario
+inner join tb_itens_pedido tip
+on
+	tip.cd_pedido = tp2.id_pedido
+where
+	tp2.dt_pedido >= (now()- interval '2 years')
+	and
+tp2.fl_pago is true
+group by
+	tu.id_usuario
+having
+	count(tp2.id_pedido) >= 3
+);
+
+create materialized view clientes_destaque as(
+with cancelados as(
+select
+	count(tp.id_pedido) valor,
+	tp.cd_usuario
+from
+	tb_pedidos tp
+where
+	upper(tx_status) = upper('cancelado')
+group by
+	cd_usuario
+),
+media as(
+select
+	avg(vpu.liquido) as valor
+from
+	vw_pedidos_usuario vpu
+)
+select tu.tx_nome, vw.id_usuario, te.tx_uf, cancelados.valor from vw_pedidos_usuario vw
+inner join tb_usuarios tu on vw.id_usuario = tu.id_usuario 
+inner join tb_enderecos te on te.cd_usuario = tu.id_usuario 
+inner join media on  vw.liquido > media.valor 
+left join cancelados on cancelados.cd_usuario = vw.id_usuario 
+where
+tu.fl_ativo is true 
+and te.fl_principal is true
+);
+
+create index
+idx_usuario_usuario
+on tb_usuarios(id_usuario);
+
+select * from clientes_destaque;
