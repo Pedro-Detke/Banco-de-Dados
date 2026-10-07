@@ -1,0 +1,119 @@
+create table tb_atividade(
+id_atividade numeric(18,0) default nextval('seq_atividade'),
+tx_nome varchar(255),
+dt_nascimento timestamp default now(),
+tx_genero varchar(255)
+);
+
+drop table tb_atividade;
+
+create sequence seq_atividade start 1 increment 1;
+
+insert into tb_atividade(tx_nome,dt_nascimento,tx_genero)
+values ('Laricio','2009-12-10','masculino'),
+('Ana','2000-5-10','feminino'),
+('Tamara','1987-2-5','feminino');
+
+create view vw_tudinho as(
+select * from tb_atividade
+)
+
+create materialized view vw_tudinho_materializado as(
+select * from tb_atividade
+)
+
+insert into tb_atividade(tx_nome,dt_nascimento,tx_genero)
+values ('Variolo','2007-3-2','masculino'),
+('Jucidia','1980-6-12','feminino'),
+('Camila','2014-8-7','feminino');
+
+
+create sequence seq_log start 1 increment 1;
+
+create table tb_atv_log(
+id_log numeric(18,0) default nextval('seq_log'),
+tx_querry varchar(800),
+nr_idade numeric(18,0),
+tx_mensagem varchar(255),
+cd_atividade numeric(18,0)
+);
+
+refresh materialized view vw_tudinho_materializado;
+
+
+
+
+
+
+create function fn_nome(
+valor numeric)
+returns varchar
+language plpgsql
+as $$
+begin
+	if(valor > 18) then 
+	return 
+		'MAIOR DE IDADE';
+	elsif (valor = 18) then
+	return
+		'EXATAMENTE 18 ANOS';
+	return
+		'MENOR DE IDADE';
+	end if;
+end
+$$;
+
+select *, fn_nome(id_atividade), fn_nome(50) from tb_atividade;
+
+select current_date, age(dt_nascimento), extract(year from(dt_nascimento)) from tb_atividade;
+
+create function fn_idade(
+dt_nascimento date)
+returns varchar
+language plpgsql
+as $$
+begin
+	if(
+extract(year from age(dt_nascimento)) > 18) then 
+	return 
+		'MAIOR DE IDADE';
+	elsif (
+extract(year from age(dt_nascimento)) = 18) then
+	return
+		'EXATAMENTE 18 ANOS';
+	return
+		'MENOR DE IDADE';
+	end if;
+end
+$$;
+
+select fn_idade(dt_nascimento) from tb_atividade;
+
+select extract(year from age(dt_nascimento)) from tb_atividade
+
+drop function fn_acha_idade
+
+create function fn_acha_idade(
+dt_nascimento timestamp)
+returns varchar
+language plpgsql
+as $$
+declare
+idade integer;
+begin
+idade := extract(year from age(dt_nascimento));
+	if(
+idade > 18) then 
+	return 
+		'MAIOR DE IDADE';
+	elsif (
+idade = 18) then
+	return
+		'EXATAMENTE 18 ANOS';
+	else
+		'MENOR DE IDADE';
+	end if;
+end
+$$;
+
+select fn_acha_idade(dt_nascimento) from tb_atividade;
