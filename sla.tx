@@ -270,3 +270,46 @@ language plpgsql as $$
 	return new;
 	end;
 $$;
+
+
+create view  vw_prod as(
+select 
+tp.id_produto,
+tp.tx_descricao,
+sum(ped.vl_total),
+max(ped.dt_pedido) as MaiorData,
+max(tu.id_usuario) as MaiorIdUser
+from tb_produtos tp 
+inner join tb_itens_pedido tip
+on
+tip.cd_produto = tp.id_produto
+inner join tb_pedidos ped
+on
+ped.id_pedido = tip.cd_pedido
+and upper(ped.tx_status) = upper('pago')
+and ped.fl_pago is true
+inner join tb_usuarios tu
+on
+tu.id_usuario = ped.cd_usuario 
+inner join tb_enderecos te
+on
+te.cd_usuario = tu.id_usuario
+and upper(te.tx_uf) = upper('SC')
+where ped.vl_total > 0 
+group by tp.id_produto, tp.tx_descricao
+limit 50
+);
+
+select * from vw_prod;
+--1,372
+
+create index
+idx_prods
+on tb_produtos(tx_descricao);
+-- 1,367 
+--0,36%
+
+create index
+idx_produts
+on tb_itens_pedido(cd_pedido);
+-- 1,589
