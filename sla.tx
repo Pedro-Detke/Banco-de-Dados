@@ -313,3 +313,94 @@ create index
 idx_produts
 on tb_itens_pedido(cd_pedido);
 -- 1,589
+
+vacuum full;
+
+	create function fn_chato( uf varchar )
+returns varchar
+language plpgsql
+as $$
+begin
+ if( upper(uf) = upper('sc'))
+	return
+		'Santa Catrina';
+elsif( upper(uf) = upper('rs'))
+	return
+		'Rio Grande do Sul';
+elsif( upper(uf) = upper('pr'))
+	return
+		'Paraná';
+elsif( upper(uf) = upper('ES'))
+	return
+		'Espirito Santo';
+elsif( upper(uf) = upper('mg'))
+	return
+		'Minas Gerais';
+elsif( upper(uf) = upper('sp'))
+	return
+		'São Paulo';
+elsif( upper(uf) = upper('rj'))
+	return
+		'Rio de Janeiro';
+elsif( upper(uf) = upper('go'))
+	return
+		'Goiás';
+elsif( upper(uf) = upper('mt'))
+	return
+		'Mato Grosso';
+elsif( upper(uf) = upper('ms'))
+	return
+		'Mato Grosso do Sul';
+elsif( upper(uf) = upper('al'))
+	return
+		'Alagoas';
+elsif( upper(uf) = upper('ba'))
+	return
+		'Bahia';
+elsif( upper(uf) = upper('ce'))
+	return
+		'Ceará';
+elsif( upper(uf) = upper('ma'))
+	return
+		'Maranhão';
+elsif( upper(uf) = upper('pb'))
+	return
+		'Paraíba';
+elsif( upper(uf) = upper('pe'))
+	return
+		'Pernambuco';
+elsif( upper(uf) = upper('pi'))
+	return
+		'Piauí';
+elsif( upper(uf) = upper('rsn'))
+	return
+		'Rio Grande do Norte';
+elsif( upper(uf) = upper('se'))
+	return
+		'Sergipe';
+elsif( upper(uf) = upper('to'))
+	return
+		'Tocantins';
+elsif( upper(uf) = upper('ac'))
+	return
+		'Acre';
+elsif( upper(uf) = upper('ap'))
+	return
+		'Amapá';
+elsif( upper(uf) = upper('am'))
+	return
+		'Amazonas';
+elsif( upper(uf) = upper('pr'))
+	return
+		'Pará';
+elsif( upper(uf) = upper('ro'))
+	return
+		'Rondônia';
+elsif( upper(uf) = upper('rr'))
+	return
+		'Roraima';
+	else
+	return	'uf inválida';
+	end if;
+end
+$$;
