@@ -404,3 +404,15 @@ elsif( upper(uf) = upper('rr'))
 	end if;
 end
 $$;
+
+create table tb_mensagem (
+id_mensagem numeric(18,0) default nextval('seq_mensagem'),
+tx_descricao varchar (255) not null
+);
+
+create sequence seq_mensagem  start 1 increment 1;
+
+insert into tb_mensagem(tx_descricao) values 
+('TESTE');
+
+create database "olamundos";
